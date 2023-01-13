@@ -20,7 +20,7 @@ _TBD-course-description_
   Do not use quotes on the <details> tag attributes.
 -->
 
-<!--step0-->
+<!--step0
 
 TBD-welcome-paragraph
 
@@ -40,7 +40,7 @@ TBD-welcome-paragraph
    ![Create a new repository](https://user-images.githubusercontent.com/1221423/169618722-406dc508-add4-4074-83f0-c7a7ad87f6f3.png)
 3. After your new repository is created, wait about 20 seconds, then refresh the page. Follow the step-by-step instructions in the new repository's README.
 
-<!--endstep0-->
+endstep0-->
 
 <!--
   <<< Author notes: Step 1 >>>
@@ -51,7 +51,7 @@ TBD-welcome-paragraph
   TBD-step-1-notes.
 -->
 
-<details id=1>
+<details id=1 open>
 <summary><h2>Step 1: TBD-step-1-name</h2></summary>
 
 _Welcome to "TBD-course-name"! :wave:_
