@@ -1,0 +1,73 @@
+name: Step 1, OIDC Hello World
+
+# This step retrieves a test secret from Vault to demonstrate basic usage of GitHub OIDC.
+
+# This will be manually triggered by the participant
+# Reference: https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+on:
+  workflow_dispatch:
+
+# Reference: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+permissions:
+  # Need `contents: read` to checkout the repository
+  # Need `id-token: write` to use the GitHub OIDC token
+  # Reference: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers#adding-permissions-settings
+  contents: read
+  id-token: write
+
+jobs:
+  example_oidc:
+    name: Your first OIDC secret
+    # When using services, the runner must be Linux
+    runs-on: ubuntu-latest
+
+    # Set up a Vault container to connect to
+    # This allows us to run our exercises without having to set up Vault infrastructure separately
+    # Reference: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idservices
+    services:
+      vault:
+        image: vault:1.12.2
+        # Make vault accessible to the runner at localhost:8200
+        ports:
+          - 8200:8200
+        # Set up Vault as a dev server with a pre-defined root token.
+        # Reference: https://developer.hashicorp.com/vault/docs/concepts/dev-server
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: vaultiscool
+        # Grant the non-root user in the container the ability to lock memory to prevent swapping data to disk.
+        # A step that is recommended when using the Vault Docker container.
+        # Reference: https://hub.docker.com/_/vault/
+        options: >-
+          --cap-add=IPC_LOCK
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Initializes Vault with a JWT backend for GitHub OIDC
+      # and sets up a role, policy, and secret to retrieve.
+      - name: Setup Vault
+        env:
+          VAULT_ADDR: http://127.0.0.1:8200
+        run: ./.github/script/1-setup.sh
+
+      - name: Retrieve Secrets
+        uses: hashicorp/vault-action@v2.4.3
+        id: secrets
+        with:
+          url: http://127.0.0.1:8200
+          path: gha
+          method: jwt
+          exportEnv: false
+          # This step created a `hello-world` Vault role in `.setup/1-setup.sh`.
+          # The role is configured to accept the GitHub OIDC token if it is issued by GitHub - therefore allowing any repo on GitHub.com.
+          # More specifically, if the `iss` claim is `https://token.actions.githubusercontent.com`.
+          role: hello-world
+          # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
+          secrets: |
+            secret/data/foobar hello | WORLD ;
+
+      - name: Print secrets
+        run: |
+          echo "Hello ${{ steps.secrets.outputs.WORLD }}!"
+          echo "Hello ${{ steps.secrets.outputs.WORLD }}!" >> "${GITHUB_STEP_SUMMARY}"
