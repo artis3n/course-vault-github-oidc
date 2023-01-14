@@ -1,15 +1,16 @@
-name: Step 1, TBD-step-1-name
+name: Step 1, Verify
 
 # This step triggers after TBD-step-1-event-desc
 # This step sets STEP to 2
 # This step closes <details id=1> and opens <details id=2>
 
-# This will run every time we TBD-step-1-event-desc
+# This will run every time we successfully invoke the "Step 1, OIDC Hello World" workflow
 # Reference https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
-  workflow_dispatch:
-  # Add events that trigger this workflow
-  # TBD-step-1-event:
+  workflow_run:
+    workflows: ["Step 1, OIDC Hello World"]
+    types:
+      - completed
 
 # Reference https://docs.github.com/en/actions/security-guides/automatic-token-authentication
 permissions:
@@ -20,28 +21,34 @@ permissions:
 jobs:
   get_current_step:
     name: Check current step number
+    # We will only run this action when:
+    # 1. The "Step 1, OIDC Hello World" workflow completes successfully
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - id: get_step
         run: |
-          echo "current_step=$(cat ./.github/script/STEP)" >> $GITHUB_OUTPUT
+          echo "current_step=$(cat ./.github/script/STEP)" >> "${GITHUB_OUTPUT}"
     outputs:
       current_step: ${{ steps.get_step.outputs.current_step }}
 
-  on_TBD-step-1-event:
-    name: On TBD-step-1-event
+  move_to_next_step:
+    name: Move to Step 2
     needs: get_current_step
 
     # We will only run this action when:
     # 1. This repository isn't the template repository
     # 2. The STEP is currently 1
-    # Reference https://docs.github.com/en/actions/learn-github-actions/contexts
-    # Reference https://docs.github.com/en/actions/learn-github-actions/expressions
+    # 3. The "Step 1, OIDC Hello World" workflow completes successfully
+    # Reference: https://docs.github.com/en/actions/learn-github-actions/contexts
+    # Reference: https://docs.github.com/en/actions/learn-github-actions/expressions
     if: >-
       ${{ !github.event.repository.is_template
-          && needs.get_current_step.outputs.current_step == 1 }}
+          && needs.get_current_step.outputs.current_step == 1
+          && github.event.workflow_run.conclusion == 'success'
+      }}
 
     # We'll run Ubuntu for performance instead of Mac or Windows
     runs-on: ubuntu-latest
@@ -53,9 +60,7 @@ jobs:
         with:
           fetch-depth: 0 # Let's get all the branches
 
-      # TBD-step-1-additional-steps
-
-      # Update README to close <details id=1> and open <details id=2>
+      # Update README to close <!--step1--> and open <!--step2-->
       # and set STEP to '2'
       - name: Update to step 2
         uses: skills/action-update-step@v1
@@ -63,4 +68,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           from_step: 1
           to_step: 2
-          branch_name: tbd-branch-name

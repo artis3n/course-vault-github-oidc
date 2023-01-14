@@ -2,7 +2,7 @@ name: Step 0, Start
 
 # This step triggers after the learner creates a new repository from the template
 # This step sets STEP to 1
-# This step closes <details id=0> and opens <details id=1>
+# This step closes <!--step0--> and opens <!--step1-->
 
 # This will run every time we create push a commit to `main`
 # Reference https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
@@ -27,9 +27,9 @@ jobs:
         uses: actions/checkout@v3
       - id: get_step
         run: |
-          echo "current_step=$(cat ./.github/script/STEP)" >> $GITHUB_OUTPUT
+          echo "current_step=$(cat ./.github/script/STEP)" >> "${GITHUB_OUTPUT}"
     outputs:
-      current_step: ${{ steps.get_step.outputs.current_step }}
+      current_step: "${{ steps.get_step.outputs.current_step }}"
 
   on_start:
     name: On start
@@ -54,9 +54,7 @@ jobs:
         with:
           fetch-depth: 0 # Let's get all the branches
 
-      # TBD-course-set-up
-
-      # Update README to close <details id=0> and open <details id=1>
+      # Update README to close <!--step0--> and open <!--step1-->
       # and set STEP to '1'
       - name: Update to step 1
         uses: skills/action-update-step@v1
@@ -64,4 +62,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           from_step: 0
           to_step: 1
-          branch_name: tbd-branch-name

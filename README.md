@@ -7,9 +7,18 @@
   Add your open source license, GitHub uses Creative Commons Attribution 4.0 International.
 -->
 
-# TBD-course-name
+# Getting Secrets From HashiCorp Vault With GitHub OIDC in Action Workflows
 
-_TBD-course-description_
+Understand the principles behind configuring OIDC authentication from GitHub Action workflows to HashiCorp Vault for least-privilege access to secrets from CI/CD pipelines.
+
+- **Who is this for**: Developers, Security engineers, and operators of secrets management programs inside organizations.
+- **What you'll learn**: How to use GitHub OIDC for fine-grained role access to secrets in HashiCorp Vault.
+- **What you'll build**: You will create three GitHub Action workflows retrieving secrets from Vault for the following use cases:
+  1. Nonproduction secrets for integration testing within pull requests
+  1. Production secrets for deployments of code from the main branch
+  1. Segregating access to secrets between jobs in a workflow file with [GitHub Environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment)
+- **Prerequisites**: You should have basic proficiency working with HashiCorp Vault. You should understand how Vault roles correspond to HCL policies and how policies grant access to secrets. Completing HashiCorp's Vault [Getting Started](https://developer.hashicorp.com/vault/tutorials/getting-started) tutorial is sufficient.
+- **How long**: This course is **TBD-step-count** steps long and takes less than **TBD-duration** to complete.
 
 <!--
   <<< Author notes: Start of the course >>>
@@ -20,27 +29,23 @@ _TBD-course-description_
   Do not use quotes on the <details> tag attributes.
 -->
 
-<!--step0
-
-TBD-welcome-paragraph
-
-- **Who is this for**: TBD-audience.
-- **What you'll learn**: TBD-objective.
-- **What you'll build**: TBD-result.
-- **Prerequisites**: TBD-prerequisites.
-- **How long**: This course is TBD-step-count steps long and takes less than TBD-duration to complete.
+<!--step0-->
 
 ## How to start this course
 
 1. Above these instructions, right-click **Use this template** and open the link in a new tab.
+
    ![Use this template](https://user-images.githubusercontent.com/1221423/169618716-fb17528d-f332-4fc5-a11a-eaa23562665e.png)
-2. In the new tab, follow the prompts to create a new repository.
+
+1. In the new tab, follow the prompts to create a new repository.
    - For owner, choose your personal account or an organization to host the repository.
    - We recommend creating a public repository—private repositories will [use Actions minutes](https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions).
-   ![Create a new repository](https://user-images.githubusercontent.com/1221423/169618722-406dc508-add4-4074-83f0-c7a7ad87f6f3.png)
-3. After your new repository is created, wait about 20 seconds, then refresh the page. Follow the step-by-step instructions in the new repository's README.
 
-endstep0-->
+    <img src="https://user-images.githubusercontent.com/6969296/212442636-86499765-9429-451a-8dfc-1d7f48fa836e.png" alt="Create a new repository" width="700" />
+
+1. After your new repository is created, wait about 20 seconds, then refresh the page. Follow the step-by-step instructions in the new repository's README.
+
+<!--endstep0-->
 
 <!--
   <<< Author notes: Step 1 >>>
@@ -51,22 +56,48 @@ endstep0-->
   TBD-step-1-notes.
 -->
 
-<details id=1 open>
-<summary><h2>Step 1: TBD-step-1-name</h2></summary>
+<!--step1-->
 
-_Welcome to "TBD-course-name"! :wave:_
+## Step 1: Introduction to OIDC
 
-TBD-step-1-information
+_Welcome to "Getting Secrets From HashiCorp Vault With GitHub OIDC in Action Workflows!" :wave:_
 
-**What is _TBD-term-1_**: TBD-definition-1
+Leveraging GitHub OIDC to Vault enables secure passwordless authentication for GitHub Actions workflows.
+This course will teach you how to configure a GitHub Actions workflow to retrieve secrets from Vault using OIDC.
+You will learn how to use GitHub's JWT claims to create Vault roles with fine-grained access to secrets.
+You will also learn how to use GitHub Environments to segregate access to secrets between jobs.
 
-### :keyboard: Activity: TBD-step-1-name
+**What is _OpenID Connect (OIDC)_?**:
+OpenID Connect is an authentication protocol built on top of OAuth 2.0 (which is an authorization protocol).
+OIDC is a way to authenticate a user or service to a third-party identity provider (IDP) using a JSON Web Token (JWT).
+Instead of managing login credentials, the token exposes parameters (known as `claims`) that can be used to authorize access to resources.
+
+**How does a workflow sign in to Vault with OIDC?**:
+GitHub authenticates directly to Vault by presenting a JWT with certain claims.
+Vault roles are pre-configured to bind to a combination of claims specified by the token.
+When a workflow presents a token to Vault, Vault verifies the token's signature and claims.
+If a role is bound to the claims, Vault returns an auth token to the workflow.
+
+On the user's side, we can use Hashicorp's [vault-action](https://github.com/hashicorp/vault-action) GitHub Action to retrieve secrets from Vault using OIDC.
+Let's explore a "hello world" example.
+
+### :keyboard: Activity: OIDC Hello World
 
 1. Open a new browser tab, and work on the steps in your second tab while you read the instructions in this tab.
-1. TBD-step-1-instructions.
+1. Go to the **Actions tab**.
+1. On the left-hand side, under "All workflows," select **Step 1, OIDC Hello World**.
+1. On the right-hand side, open the **Run workflow** menu and click **Run workflow**.
+
+    <img src="https://user-images.githubusercontent.com/6969296/212499178-7cfc18f9-6860-4d88-a21d-02806b358bb2.png" alt="Manually run workflow" width="500" />
+
+1. It takes about 40 seconds for this workflow to run. Wait until the workflow completes - you should see a green checkmark.
+
+    ![Workflow succeeds](https://user-images.githubusercontent.com/6969296/212499278-76d5ad7b-7e4c-4235-b394-cbe64cce66b9.png)
+
 1. Wait about 20 seconds then refresh this page for the next step.
 
-</details>
+<!--endstep1-->
+
 
 <!--
   <<< Author notes: Step 2 >>>
@@ -75,10 +106,11 @@ TBD-step-1-information
   TBD-step-2-notes.
 -->
 
-<details id=2>
-<summary><h2>Step 2: TBD-step-2-name</h2></summary>
+<!--step2-->
 
-_You did TBD-step-1-name! :tada:_
+## Step 2: The GitHub OIDC Workflow
+
+_You successfully authenticated and retrieved a Vault secret using GitHub OIDC! :tada:_
 
 TBD-step-2-information
 
@@ -89,7 +121,7 @@ TBD-step-2-information
 1. TBD-step-2-instructions.
 1. Wait about 20 seconds then refresh this page for the next step.
 
-</details>
+<!--endstep2-->
 
 <!--
   <<< Author notes: Step 3 >>>
