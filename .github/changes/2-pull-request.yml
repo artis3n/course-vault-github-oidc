@@ -69,7 +69,7 @@ jobs:
             "user_claim": "actor",
             "bound_claims": {
 
-              # Fill in missing `sub` claim
+              # Fill in missing "sub" claim
 
             },
             "policies": ["pr-policy"],
