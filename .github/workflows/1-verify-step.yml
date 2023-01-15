@@ -1,10 +1,10 @@
 name: Step 1, Verify
 
-# This step triggers after TBD-step-1-event-desc
+# This step triggers after a participant manually runs the "Step 1, OIDC Hello World" workflow
 # This step sets STEP to 2
 # This step closes <details id=1> and opens <details id=2>
 
-# This will run every time we successfully invoke the "Step 1, OIDC Hello World" workflow
+# This will run every time we invoke the "Step 1, OIDC Hello World" workflow
 # Reference https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
   workflow_run:
@@ -21,9 +21,6 @@ permissions:
 jobs:
   get_current_step:
     name: Check current step number
-    # We will only run this action when:
-    # 1. The "Step 1, OIDC Hello World" workflow completes successfully
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -60,7 +57,11 @@ jobs:
         with:
           fetch-depth: 0 # Let's get all the branches
 
-      # Update README to close <!--step1--> and open <!--step2-->
+      # Add a workflow file for the step 2 activity
+      - name: Prepare step 2
+        run: cp ./.github/changes/2-pull-request.yml ./.github/workflows/2-pull-request.yml
+
+      # Update README to close <details id=1> and open <details id=2>
       # and set STEP to '2'
       - name: Update to step 2
         uses: skills/action-update-step@v1
