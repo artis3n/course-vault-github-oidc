@@ -1,0 +1,97 @@
+name: Step 3, Fine-grained permissions - branches
+
+# This step will retrieve a secret from Vault only if the workflow is triggered from the main branch
+
+# This workflow will only succeed when run from a push to the `main` branch,
+# but participants should attempt to run it from other triggers, such as manually, to observe the outcome
+# Reference: https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+# Reference: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+permissions:
+  # Need `contents: read` to checkout the repository
+  # Need `id-token: write` to use the GitHub OIDC token
+  # Reference: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers#adding-permissions-settings
+  contents: read
+  id-token: write
+
+jobs:
+  oidc_branch:
+    name: Secrets only from the default branch
+    # When using services, the runner must be Linux
+    runs-on: ubuntu-latest
+
+    # Set up a Vault container to connect to
+    # This allows us to run our exercises without having to set up Vault infrastructure separately
+    # Reference: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idservices
+    services:
+      vault:
+        image: vault:1.12.2
+        # Make vault accessible to the runner at localhost:8200
+        ports:
+          - 8200:8200
+        # Set up Vault as a dev server with a pre-defined root token.
+        # Reference: https://developer.hashicorp.com/vault/docs/concepts/dev-server
+        env:
+          VAULT_DEV_ROOT_TOKEN_ID: vaultiscool
+        # Grant the non-root user in the container the ability to lock memory to prevent swapping data to disk.
+        # A step that is recommended when using the Vault Docker container.
+        # Reference: https://hub.docker.com/_/vault/
+        options: >-
+          --cap-add=IPC_LOCK
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Initializes Vault with a JWT backend for GitHub OIDC
+      # Creates a `main-policy` policy granting access to `secret/data/production`
+      - name: Setup Vault
+        env:
+          VAULT_ADDR: http://127.0.0.1:8200
+        run: ./.github/script/3-setup.sh
+
+      ###############################################################
+      # Assign an appropriate bound_claims for this activity        #
+      # See the Step 3 instructions on the README for more details  #
+      ###############################################################
+      - name: Create an OIDC Role
+        env:
+          VAULT_ADDR: http://127.0.0.1:8200
+        run: |
+          vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
+          {
+            "role_type": "jwt",
+            "user_claim": "actor",
+            "bound_claims": {
+
+              # Fill in missing "sub" claim
+
+            },
+            "policies": ["main-policy"],
+            "ttl": "60s"
+          }
+          EOF
+
+      - name: Retrieve Secrets
+        uses: hashicorp/vault-action@v2.4.3
+        id: secrets
+        with:
+          role: ""  # Don't forget to enter the role name you created above!
+          # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
+          secrets: |
+            secret/data/production access_token | ACCESS_TOKEN ;
+          # Required configuration, do not modify
+          url: http://127.0.0.1:8200
+          path: gha
+          method: jwt
+          exportEnv: false
+
+      - name: Use the secret
+        # Dummy example showing the secret is not an empty string
+        run: |
+          echo "::notice::🔐 Logging in to secure **production** system! ${{ steps.secrets.outputs.ACCESS_TOKEN != '' }}"
