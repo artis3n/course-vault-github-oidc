@@ -1,15 +1,16 @@
-name: Step 4, TBD-step-4-name
+name: Step 4, Verify
 
-# This step triggers after TBD-step-4-event-desc
+# This step triggers after a workflow with Environments is triggered on the repository.
 # This step sets STEP to 5
 # This step closes <details id=4> and opens <details id=5>
 
-# This will run every time we TBD-step-4-event-desc
+# This will run every time we invoke the "Step 4: Fine-grained permissions - environments" workflow
 # Reference https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
-  workflow_dispatch:
-  # Add events that trigger this workflow
-  # TBD-step-4-event:
+  workflow_run:
+    workflows: [ "Step 4: Fine-grained permissions - environments" ]
+    types:
+      - completed
 
 # Reference https://docs.github.com/en/actions/security-guides/automatic-token-authentication
 permissions:
@@ -30,18 +31,21 @@ jobs:
     outputs:
       current_step: ${{ steps.get_step.outputs.current_step }}
 
-  on_TBD-step-4-event:
-    name: On TBD-step-4-event
+  move_to_next_step:
+    name: Move to Step 5
     needs: get_current_step
 
     # We will only run this action when:
     # 1. This repository isn't the template repository
     # 2. The STEP is currently 4
+    # 3. The "Step 4: Fine-grained permissions - environments" workflow completes successfully
     # Reference https://docs.github.com/en/actions/learn-github-actions/contexts
     # Reference https://docs.github.com/en/actions/learn-github-actions/expressions
     if: >-
       ${{ !github.event.repository.is_template
-          && needs.get_current_step.outputs.current_step == 4 }}
+          && needs.get_current_step.outputs.current_step == 4
+          && github.event.workflow_run.conclusion == 'success'
+      }}
 
     # We'll run Ubuntu for performance instead of Mac or Windows
     runs-on: ubuntu-latest
@@ -53,8 +57,6 @@ jobs:
         with:
           fetch-depth: 0 # Let's get all the branches
 
-      # TBD-step-4-additional-steps
-
       # Update README to close <details id=4> and open <details id=5>
       # and set STEP to '5'
       - name: Update to step 5
@@ -63,4 +65,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           from_step: 4
           to_step: 5
-          branch_name: tbd-branch-name
