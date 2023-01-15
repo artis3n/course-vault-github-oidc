@@ -7,14 +7,14 @@
   Add your open source license, GitHub uses Creative Commons Attribution 4.0 International.
 -->
 
-# Getting Secrets From HashiCorp Vault With GitHub OIDC in Action Workflows
+# Getting secrets from HashiCorp Vault with GitHub OIDC in Action workflows
 
 Understand the principles behind configuring OIDC authentication from GitHub Action workflows to HashiCorp Vault for least-privilege access to secrets from CI/CD pipelines.
 
 - **Who is this for**: Developers, Security engineers, and operators of secrets management programs inside organizations.
 - **What you'll learn**: How to use GitHub OIDC for fine-grained role access to secrets in HashiCorp Vault.
 - **What you'll build**: You will create three GitHub Action workflows retrieving secrets from Vault for the following use cases:
-  1. Nonproduction secrets for integration testing within pull requests
+  1. Non-production secrets for integration testing within pull requests
   1. Production secrets for deployments of code from the main branch
   1. Segregating access to secrets between jobs in a workflow file with [GitHub Environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment)
 - **Prerequisites**:
@@ -23,7 +23,7 @@ Understand the principles behind configuring OIDC authentication from GitHub Act
   Completing HashiCorp's Vault [Getting Started](https://developer.hashicorp.com/vault/tutorials/getting-started) tutorial is sufficient.
   1. You should also understand the layout of a GitHub Actions workflow file.
   The GitHub tutorial [Continuous Integration](https://github.com/skills/continuous-integration) provides a good introduction.
-- **How long**: This course is **TBD-step-count** steps long and takes less than **TBD-duration** to complete.
+- **How long**: This course is 4 steps long and takes less than 1 hour to complete.
 
 <!--
   <<< Author notes: Start of the course >>>
@@ -280,6 +280,8 @@ We're showcasing fine-grained permissions with Vault, here!
 The workflow won't run unless the `org/repo` is correct for your repository.
     ```yml
     - name: Create an OIDC Role
+      env:
+        VAULT_ADDR: http://127.0.0.1:8200
       run: |
         vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
         {
@@ -474,6 +476,8 @@ We're showcasing fine-grained permissions with Vault, here!
 The workflow won't run unless the `org/repo` is correct for your repository.
     ```yml
     - name: Create an OIDC Role
+      env:
+        VAULT_ADDR: http://127.0.0.1:8200
       run: |
         vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
         {
@@ -506,7 +510,7 @@ The workflow won't run unless the `org/repo` is correct for your repository.
         exportEnv: false
     ```
 1. Everything is set up for you, however the `role: ""` is missing.
-   Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
+Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
     ```yml
     role: "GIVE_ME_A_NAME"  # Enter the same role name you previously chose!
     ```
@@ -539,36 +543,169 @@ Ensure the `role` name matches between both steps in the workflow.
 
 _Nicely done with Step 3: Fine-grained permissions - branches! :partying_face:_
 
-TBD-step-4-information
+Our last workflow will demonstrate how to provide fine-grained access control to Vault roles inside the same workflow file using [GitHub Environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment).
+We'll follow the same instructions as in the previous activities, but this time we'll have two jobs to configure in the same workflow file.
+We'll also need to create the GitHub Environments on our repository.
 
-**What is _TBD-term-4_**: TBD-definition-4
+### :keyboard: Activity: Fine-grained permissions - environments
 
-### :keyboard: Activity: TBD-step-4-name
+1. Open this repository in a code editor.
+If you still have this repository open from the previous activity, make sure to pull the latest changes from the `main` branch.
+    ```bash
+    git checkout main
+    git pull
+    ```
+1. You can work from whatever branch you'd prefer for this activity, including the `main` branch.
+Our examples will use a `step4` branch.
+1. After the previous activity, you should see a new workflow file in the repo: `.github/workflows/4-environment.yml`.
+Open this file in your code editor.
+1. There are two jobs in this workflow file! `staging` and `prod`.
+We'll configure a Vault role for each job.
+Notice the `staging` job includes the `environment: Staging` attribute and the `prod` job includes the `environment: Production` attribute.
+To learn more about using Environments in workflow files, see [GitHub's workflow syntax for environments](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idenvironment).
+    ```yml
+    staging:
+      name: Retrieve staging secrets
+      # We need to create a "Staging" Environment and bind it to Vault!
+      environment: Staging
 
-1. TBD-step-4-instructions.
-1. Wait about 20 seconds then refresh this page for the next step.
+      # ...
 
-</details>
+    prod:
+      name: Retrieve production secrets
+      # We need to create a "Production" Environment and bind it to Vault!
+      environment: Production
+    ```
+1. Under the **staging** job, locate the step `name: Create an OIDC Role`.
+1. Under the **staging** job, replace this step with the following code.
+**Replace the `YOUR_REPO` section with the `org/repo` that applies to the repository you created from this course**.
+For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:environment:Staging"`.
+We're showcasing fine-grained permissions with Vault, here!
+The workflow won't run unless the `org/repo` is correct for your repository.
+    ```yml
+    - name: Create an OIDC Role
+      env:
+        VAULT_ADDR: http://127.0.0.1:8200
+      run: |
+        vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
+        {
+          "role_type": "jwt",
+          "user_claim": "actor",
+          "bound_claims": {
+            "sub": "repo:YOUR_REPO:environment:Staging"
+          },
+          "policies": ["staging-policy"],
+          "ttl": "60s"
+        }
+        EOF
+    ```
+1. Don't forget to pick a name for your Vault role as well!
+In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` and `-`) name of your choosing.
+1. Under the **staging** job, locate the next step in the job, `name: Retrieve Secrets`.
+    ```yml
+    - name: Retrieve Secrets
+      uses: hashicorp/vault-action@v2.4.3
+      id: secrets
+      with:
+        role: ""  # Don't forget to enter the role name you created above!
+        # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
+        secrets: |
+          secret/data/staging access_token | ACCESS_TOKEN ;
+        # Required configuration, do not modify
+        url: http://127.0.0.1:8200
+        path: gha
+        method: jwt
+        exportEnv: false
+    ```
+1. Now repeat both updates for the **prod** job.
+1. Under the **prod** job, locate the step `name: Create an OIDC Role`.
+1. Under the **prod** job, replace this step with the following code.
+   **Replace the `YOUR_REPO` section with the `org/repo` that applies to the repository you created from this course**.
+   For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:environment:Production"`.
+   We're showcasing fine-grained permissions with Vault, here!
+   The workflow won't run unless the `org/repo` is correct for your repository.
+    ```yml
+    - name: Create an OIDC Role
+      env:
+        VAULT_ADDR: http://127.0.0.1:8200
+      run: |
+        vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
+        {
+          "role_type": "jwt",
+          "user_claim": "actor",
+          "bound_claims": {
+            "sub": "repo:YOUR_REPO:environment:Production"
+          },
+          "policies": ["prod-policy"],
+          "ttl": "60s"
+        }
+        EOF
+    ```
+1. Don't forget to pick a name for your Vault role as well!
+   In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` and `-`) name of your choosing.
+1. Under the **prod** job, locate the next step in the job, `name: Retrieve Secrets`.
+    ```yml
+    - name: Retrieve Secrets
+      uses: hashicorp/vault-action@v2.4.3
+      id: secrets
+      with:
+        role: ""  # Don't forget to enter the role name you created above!
+        # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
+        secrets: |
+          secret/data/production access_token | ACCESS_TOKEN ;
+        # Required configuration, do not modify
+        url: http://127.0.0.1:8200
+        path: gha
+        method: jwt
+        exportEnv: false
+    ```
+1. Everything is set up for you, however the `role: ""` is missing.
+Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
+    ```yml
+    role: "GIVE_ME_A_NAME"  # Enter the same role name you previously chose!
+    ```
 
-<!--
-  <<< Author notes: Step 5 >>>
-  Start this step by acknowledging the previous step.
-  Define terms and link to docs.github.com.
-  TBD-step-5-notes.
--->
+Great work! :computer:
 
-<details id=5>
-<summary><h2>Step 5: Merge your pull request</h2></summary>
+We've set up our workflow file to retrieve secrets from GitHub Environments, but we haven't created the Environments yet.
+Let's do that now.
 
-_Almost there TBD-step-4-name! :heart:_
+### :keyboard: Activity: Create the GitHub Environments
 
-You can now [merge](https://docs.github.com/en/get-started/quickstart/github-glossary#merge) your pull request!
+1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
+1. Go to the **Settings tab**.
+1. On the left-hand side, select **Environments** then **New environment**.
+    ![Environment settings](https://user-images.githubusercontent.com/6969296/212564551-12594c1b-63d9-4826-a291-faff012d98af.png)
+1. Enter `Staging` as the name of the environment and click **Configure environment**.
+    ![Name environment staging](https://user-images.githubusercontent.com/6969296/212564575-498e47af-97df-4959-b071-8aefafba99b7.png)
+1. For OIDC to Vault, we do not need to configure any additional settings on the environment, however we can always include additional settings should we want further access controls (such as requiring a production environment only work from the `main` branch).
+    ![No environment configuration](https://user-images.githubusercontent.com/6969296/212564636-f8eccc66-25d7-4f2f-b36c-b2101acd9645.png)
+1. Now repeat the same steps to create a `Production` environment.
+Just as with `Staging`, do not configure any additional settings on the environment for this activity.
 
-### :keyboard: Activity: Merge your pull request
+You should now have two environments configured on your repository, `Staging` and `Production`.
 
-1. Click **Merge pull request**.
-1. Delete the branch `TBD-branch-name` (optional).
-1. Wait about 20 seconds then refresh this page for the next step.
+![List of environments](https://user-images.githubusercontent.com/6969296/212564665-d44c530c-f4dc-4917-bbec-23c089146f4b.png)
+
+### :keyboard: Activity: Run the workflow!
+
+We're now ready to run the workflow!
+
+1. Commit the changes from these two activities to your chosen branch and push them to GitHub.
+This example will use a `stage4` branch.
+    ```bash
+    git checkout -b stage4
+    git add .
+    git commit -m "Fine-grained permissions - branches"
+    git push
+    ```
+1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
+1. Go to the **Actions** tab.
+1. On the left-hand side, under "All workflows," select **Step 4, Fine-grained permissions - environments**.
+After a few seconds, you should observe a new workflow start up.
+1. Wait until the workflow completes - you should see a green checkmark.
+If the workflow fails, check the previous activities to ensure you've created two environments and configured both Vault roles in the workflow file.
+1. Once the workflow is successful, wait about 20 seconds further, then refresh this README page for the next step.
 
 </details>
 
@@ -577,24 +714,27 @@ You can now [merge](https://docs.github.com/en/get-started/quickstart/github-glo
   Review what we learned, ask for feedback, provide next steps.
 -->
 
-<details id=X>
+<details id=5>
 <summary><h2>Finish</h2></summary>
 
 _Congratulations friend, you've completed this course!_
 
-<img src=TBD-celebrate-image alt=celebrate width=300 align=right>
-
 Here's a recap of all the tasks you've accomplished in your repository:
+- Configure Vault to accept GitHub OIDC authentication requests
+- Customize the `bound_claims` of a Vault role to provide fine-grained access control across workflows
+- Create a workflow that can only retrieve secrets when triggered by a pull request
+- Create a workflow that can only retrieve secrets when triggered by a push to the `main` branch
+- Create jobs in a workflow that can only retrieve secrets when assigned to a specific GitHub Environment
 
-- TBD-recap.
+Remember that configuring Vault roles should typically happen separately from consuming secrets, so you'll likely want to create a separate workflow that creates Vault roles.
+However, for the sake of this course, we've configured Vault roles in the same workflow that consumed secrets.
 
 ### What's next?
 
-- TBD-continue.
-- [We'd love to hear what you thought of this course](TBD-feedback-link).
-- [Take another TBD-organization Course](https://github.com/TBD-organization).
-- [Read the GitHub Getting Started docs](https://docs.github.com/en/get-started).
-- To find projects to contribute to, check out [GitHub Explore](https://github.com/explore).
+- We'd love to hear what you thought of this course [in our discussion board](https://github.com/artis3n/tutorial-vault-github-oidc/discussions).
+- You can combine multiple claims in a single Vault role to provide even more fine-grained access control!
+For example, learn how to combine `sub` and `job_workflow_ref` to [provide secrets for reusable workflows](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows).
+- Use this [Terraform module](https://github.com/digitalocean/terraform-vault-github-oidc) to help manage your GitHub OIDC Vault role configurations.
 
 </details>
 
@@ -605,6 +745,6 @@ Here's a recap of all the tasks you've accomplished in your repository:
 
 ---
 
-Get help: [TBD-support](TBD-support-link) &bull; [Review the GitHub status page](https://www.githubstatus.com/)
+Get help: [Post in our discussion board](https://github.com/artis3n/tutorial-vault-github-oidc/discussions) &bull; Something not working? [File an issue ticket](https://github.com/artis3n/tutorial-vault-github-oidc/issues)
 
-&copy; 2022 TBD-copyright-holder &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [CC-BY-4.0 License](https://creativecommons.org/licenses/by/4.0/legalcode)
+&copy; 2022 Ari Kalfus &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [CC-BY-4.0 License](https://creativecommons.org/licenses/by/4.0/legalcode)

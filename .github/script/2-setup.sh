@@ -16,7 +16,7 @@ oidc_discovery_url="https://token.actions.githubusercontent.com"
 
 # Create a secret
 vault kv put secret/development access_token=abc123
-# Add OIDC role and policy
+# Add a policy
 vault policy write pr-policy - << EOF
 path "secret/data/development" {
   capabilities = ["read"]
