@@ -57,12 +57,6 @@ jobs:
         with:
           fetch-depth: 0 # Let's get all the branches
 
-      # Adds a workflow file for the step 3 activity
-      - name: Prepare step 3
-        run: ./.github/script/prepare-step.sh "3-main-branch.yml"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # Update README to close <details id=2> and open <details id=3>
       # and set STEP to '3'
       - name: Update to step 3

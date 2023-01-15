@@ -57,12 +57,6 @@ jobs:
         with:
           fetch-depth: 0 # Let's get all the branches
 
-      # Add a workflow file for the step 2 activity
-      - name: Prepare step 2
-        run: ./.github/script/prepare-step.sh "2-pull-request.yml"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # Update README to close <details id=1> and open <details id=2>
       # and set STEP to '2'
       - name: Update to step 2
