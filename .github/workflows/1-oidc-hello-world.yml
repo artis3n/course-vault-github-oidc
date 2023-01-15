@@ -55,7 +55,7 @@ jobs:
         uses: hashicorp/vault-action@v2.4.3
         id: secrets
         with:
-          # This step created a `hello-world` Vault role in `.setup/1-setup.sh`.
+          # The previous step created a `hello-world` Vault role in `.setup/1-setup.sh`.
           # The role is configured to accept the GitHub OIDC token if it is issued by GitHub - therefore allowing any repo on GitHub.com.
           # More specifically, if the `iss` claim is `https://token.actions.githubusercontent.com`.
           role: hello-world

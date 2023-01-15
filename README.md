@@ -88,6 +88,11 @@ Let's explore a "hello world" example.
 
 ### :keyboard: Activity: OIDC Hello World
 
+You may see some workflows fail for future steps, like "Step 4, Fine-grained permissions - environments".
+That is ok!
+We will get to them later.
+You can ignore those failures for now.
+
 1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
 1. Go to the **Actions tab**.
 1. On the left-hand side, under "All workflows," select **Step 1, OIDC Hello World**.
@@ -172,6 +177,7 @@ We'll take a look at this setup script in a moment.
 Here we use HashiCorp's [vault-action](https://github.com/hashicorp/vault-action) to retrieve a secret from Vault using OIDC.
 We specify the Vault role we want (`hello-world`), whatever secrets we want to retrieve, and, optionally but recommended for clarity, what output variable we'd like to assign to each secret.
 In this case, we save the output of the secret to the `WORLD` variable.
+
 If our OIDC configuration for the `hello-world` role matches the token that GitHub presents, our workflow will get an auth token and the requested secrets (assuming the Vault role's policy permits those paths).
 
 ```yaml
@@ -242,7 +248,7 @@ EOF
 Finally, we created a role that binds to the `iss` claim in GitHub's OIDC token.
 This claim means that anyone anywhere on github.com can authenticate to this Vault instance and be granted the `hello-policy` policy.
 You don't want to use this in real life! :wink: :scream:
-We'll explore real-world examples in the next steps of this course.
+We'll explore real-world examples of fine-grained access in the next steps of this course.
 
 Let's look at the other values:
 - `role_type` should always be `jwt` for GitHub OIDC.
@@ -271,12 +277,15 @@ This role will allow a workflow to authenticate to Vault, but only if the workfl
 1. Open this repository in a code editor.
 1. From the code editor, checkout a new branch.
 **For this activity, you must open a pull request from a branch other than `main`.**
+    ```bash
+    git checkout -b step2
+    ```
 1. In your code editor, open the file `.github/workflows/2-pull-request.yml`.
 1. Locate the step `name: Create an OIDC Role`.
 1. Replace this step with the following code.
-**Replace the `YOUR_REPO` section with the `org/repo` that applies to the repository you created from this course**.
+**Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course**.
 For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:pull_request"`.
-The workflow won't run unless the `org/repo` is correct for your repository.
+The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
       env:
@@ -318,19 +327,23 @@ Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
     role: "GIVE_ME_A_NAME"  # Enter the same role name you previously chose!
     ```
 1. Commit these changes to your branch and push your branch to GitHub.
-Via the UI or CLI, open a pull request from your branch to the `main` branch.
+Open a pull request from your branch to the `main` branch.
     ```bash
+    git add .
+    git commit -m "Add OIDC role for pull requests"
     gh pr create --title "Fine-grained permissions - pull requests" --body "This pull request adds a new workflow that uses Vault to retrieve a secret only if the workflow runs inside a pull request."
     ```
+    The `gh` command comes from the [GitHub CLI](https://cli.github.com/).
+    You can create the pull request from the UI as well.
 1. Go to the **Pull Requests** tab and open your new pull request.
 After a few seconds, you should observe the `Step 2, Fine-grained permissions - pull requests` workflow begin to run on your PR.
 
     ![Pull request workflow running](https://user-images.githubusercontent.com/6969296/212520410-1f4a73ba-67db-4471-bf2c-fcc2d819f473.png)
 
-1. You may see other workflows trigger and fail for future steps, like "Step 4, Fine-grained permissions - environments".
-That is ok!
-We will get to them later.
-You can ignore those failures for now.
+    You may see other workflows trigger and fail for future steps, like "Step 4, Fine-grained permissions - environments".
+    That is ok!
+    We will get to them later.
+    You can ignore those failures for now.
 1. Wait until your `Step 2, Fine-grained permissions - pull requests` workflow completes - you should see a green checkmark.
 If the workflow fails, check that your `org/repo` value is correct for your current repository!
 Ensure the `role` name matches between both steps in the workflow.
@@ -475,9 +488,9 @@ If you still have this repository open from the previous activity, make sure to 
 1. In your code editor, open the file `.github/workflows/3-main-branch.yml`.
 1. Locate the step `name: Create an OIDC Role`.
 1. Replace this step with the following code.
-**Replace the `YOUR_REPO` section with the `org/repo` that applies to the repository you created from this course**.
+**Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course**.
 For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:ref:refs/heads/main"`.
-The workflow won't run unless the `org/repo` is correct for your repository.
+The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
       env:
@@ -525,13 +538,14 @@ Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
     git commit -m "Fine-grained permissions - branches"
     git push
     ```
+1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
 1. Go to the **Actions** tab.
 1. On the left-hand side, under "All workflows," select **Step 3, Fine-grained permissions - branches**.
 After a few seconds, you should observe a new workflow start up.
 1. Wait until the workflow completes - you should see a green checkmark.
 If the workflow fails, check that your `org/repo` value is correct for your current repository!
 Ensure the `role` name matches between both steps in the workflow.
-1. Once the PR workflow is successful, wait about 20 seconds further, then refresh this README page for the next step.
+1. Once this workflow is successful, wait about 20 seconds further, then refresh this README page for the next step.
 
 </details>
 
@@ -561,6 +575,9 @@ If you still have this repository open from the previous activity, make sure to 
     ```
 1. You can work from whatever branch you'd prefer for this activity, including the `main` branch.
 Our examples will use a `step4` branch.
+   ```bash
+    git checkout -b step4
+    ```
 1. In your code editor, open the file `.github/workflows/4-environment.yml`.
 1. There are two jobs in this workflow file!
 `staging` and `prod`.
@@ -582,11 +599,9 @@ To learn more about using Environments in workflow files, see [GitHub's workflow
     ```
 1. Under the **staging** job, locate the step `name: Create an OIDC Role`.
 1. Under the **staging** job, replace this step with the following code.
-**Replace the `YOUR_REPO` section with the `org/repo` that applies to the repository you created from this course**.
+**Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course**.
 For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:environment:Staging"`.
-The workflow won't run unless the `org/repo` is correct for your repository.
-**Environment names are case-sensitive.**
-`staging` is not the same as `Staging`.
+The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
       env:
@@ -604,6 +619,8 @@ The workflow won't run unless the `org/repo` is correct for your repository.
         }
         EOF
     ```
+   **Environment names are case-sensitive.**
+   `staging` is not the same as `Staging`.
 1. Don't forget to pick a name for your Vault role as well!
 In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` and `-`) name of your choosing.
 1. Under the **staging** job, locate the next step in the job, `name: Retrieve Secrets`.
@@ -622,14 +639,17 @@ In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` 
         method: jwt
         exportEnv: false
     ```
+1. Everything is set up for you, however the `role: ""` is missing.
+Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
+    ```yml
+    role: "GIVE_ME_A_NAME"  # Enter the same role name you previously chose!
+    ```
 1. Now repeat both updates for the **prod** job.
 1. Under the **prod** job, locate the step `name: Create an OIDC Role`.
 1. Under the **prod** job, replace this step with the following code.
-**Replace the `YOUR_REPO` section with the `org/repo` that applies to the repository you created from this course**.
+**Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course**.
 For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:environment:Production"`.
-The workflow won't run unless the `org/repo` is correct for your repository.
-**Environment names are case-sensitive.**
-`production` is not the same as `Production`.
+The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
       env:
@@ -647,6 +667,8 @@ The workflow won't run unless the `org/repo` is correct for your repository.
         }
         EOF
     ```
+   **Environment names are case-sensitive.**
+   `production` is not the same as `Production`.
 1. Don't forget to pick a name for your Vault role as well!
 In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` and `-`) name of your choosing.
 1. Under the **prod** job, locate the next step in the job, `name: Retrieve Secrets`.
@@ -673,6 +695,8 @@ Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
 
 Great work! :computer:
 
+_Don't commit and push these changes just yet!_
+
 We've set up our workflow file to retrieve secrets from GitHub Environments, but we haven't created the Environments yet.
 Let's do that now.
 
@@ -688,7 +712,7 @@ Let's do that now.
 
     ![Name environment staging](https://user-images.githubusercontent.com/6969296/212564575-498e47af-97df-4959-b071-8aefafba99b7.png)
 
-1. For OIDC to Vault, we do not need to configure any additional settings on the environment, however we can always include additional settings should we want further access controls (such as requiring a production environment only work from the `main` branch).
+1. For OIDC to Vault we do not need to configure any additional settings on the environment, however we can always include additional settings should we want further access controls (such as restricting a production environment to the `main` branch).
 
     ![No environment configuration](https://user-images.githubusercontent.com/6969296/212564636-f8eccc66-25d7-4f2f-b36c-b2101acd9645.png)
 
@@ -709,15 +733,24 @@ This example will use a `step4` branch.
     git checkout -b step4
     git add .
     git commit -m "Fine-grained permissions - environments"
-    git push
+    git push --set-upstream origin step4
     ```
 1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
 1. Go to the **Actions** tab.
 1. On the left-hand side, under "All workflows," select **Step 4, Fine-grained permissions - environments**.
 After a few seconds, you should observe a new workflow start up.
-1. Wait until the workflow completes - you should see a green checkmark.
+1. Wait until the workflow completes - you should see both the `staging` and `production` jobs complete successfully with a green checkmark.
 If the workflow fails, check the previous activities to ensure you've created two environments and configured both Vault roles in the workflow file.
-1. Once the workflow is successful, wait about 20 seconds further, then refresh this README page for the next step.
+
+    ![Both environments deploy successfully](https://user-images.githubusercontent.com/6969296/212571497-39feb61a-c1b6-4d3f-8411-9ad3ea029794.png)
+
+1. Once the workflow is successful, merge your `step4` branch into `main`.
+    ```bash
+    git checkout main
+    git merge step4
+    git push
+    ```
+1. Wait about 1 minute further, then refresh this README page for the next step.
 
 </details>
 
@@ -729,7 +762,7 @@ If the workflow fails, check the previous activities to ensure you've created tw
 <details id=5>
 <summary><h2>Finish</h2></summary>
 
-_Congratulations friend, you've completed this course!_
+_Congratulations friend, you've completed this course! :1st_place_medal: _
 
 Here's a recap of all the tasks you've accomplished in your repository:
 - Configure Vault to accept GitHub OIDC authentication requests

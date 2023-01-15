@@ -4,11 +4,11 @@ name: Step 4, Verify
 # This step sets STEP to 5
 # This step closes <details id=4> and opens <details id=5>
 
-# This will run every time we invoke the "Step 4: Fine-grained permissions - environments" workflow
+# This will run every time we invoke the "Step 4, Fine-grained permissions - environments" workflow
 # Reference https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
   workflow_run:
-    workflows: [ "Step 4: Fine-grained permissions - environments" ]
+    workflows: [ "Step 4, Fine-grained permissions - environments" ]
     types:
       - completed
 
@@ -38,7 +38,7 @@ jobs:
     # We will only run this action when:
     # 1. This repository isn't the template repository
     # 2. The STEP is currently 4
-    # 3. The "Step 4: Fine-grained permissions - environments" workflow completes successfully
+    # 3. The "Step 4, Fine-grained permissions - environments" workflow completes successfully
     # Reference https://docs.github.com/en/actions/learn-github-actions/contexts
     # Reference https://docs.github.com/en/actions/learn-github-actions/expressions
     if: >-
