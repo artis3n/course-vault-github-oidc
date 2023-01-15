@@ -1,11 +1,15 @@
-name: Step 1, OIDC Hello World
+name: Step 2, Fine-grained permissions - pull requests
 
-# This step retrieves a test secret from Vault to demonstrate basic usage of GitHub OIDC.
+# This step will retrieve a secret from Vault only if the workflow is triggered from a pull request
 
-# This will be manually triggered by the participant
+# This workflow will only succeed when run from a pull request,
+# but participants should attempt to run it from other triggers, such as manually, to observe the outcome
 # Reference: https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 # Reference: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
 permissions:
@@ -16,8 +20,8 @@ permissions:
   id-token: write
 
 jobs:
-  example_oidc:
-    name: Your first OIDC secret
+  oidc_pr:
+    name: Secrets only from pull requests
     # When using services, the runner must be Linux
     runs-on: ubuntu-latest
 
@@ -45,31 +49,49 @@ jobs:
         uses: actions/checkout@v3
 
       # Initializes Vault with a JWT backend for GitHub OIDC
-      # and sets up a role, policy, and secret to retrieve.
+      # Creates a `pr-policy` policy granting access to `secret/data/development`
       - name: Setup Vault
         env:
           VAULT_ADDR: http://127.0.0.1:8200
-        run: ./.github/script/1-setup.sh
+        run: ./.github/script/2-setup.sh
+
+      ###############################################################
+      # Assign an appropriate bound_claims for this activity        #
+      # See the Step 2 instructions on the README for more details  #
+      ###############################################################
+      - name: Create an OIDC Role
+        env:
+          VAULT_ADDR: http://127.0.0.1:8200
+        run: |
+          vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
+          {
+            "role_type": "jwt",
+            "user_claim": "actor",
+            "bound_claims": {
+
+              # Fill in missing `sub` claim
+
+            },
+            "policies": ["pr-policy"],
+            "ttl": "60s"
+          }
+          EOF
 
       - name: Retrieve Secrets
         uses: hashicorp/vault-action@v2.4.3
         id: secrets
         with:
-          # This step created a `hello-world` Vault role in `.setup/1-setup.sh`.
-          # The role is configured to accept the GitHub OIDC token if it is issued by GitHub - therefore allowing any repo on GitHub.com.
-          # More specifically, if the `iss` claim is `https://token.actions.githubusercontent.com`.
-          role: hello-world
+          role: ""  # Don't forget to enter the role name you created above!
           # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
           secrets: |
-            secret/data/foobar hello | WORLD ;
+            secret/data/development access_token | ACCESS_TOKEN ;
           # Required configuration, do not modify
           url: http://127.0.0.1:8200
           path: gha
           method: jwt
           exportEnv: false
 
-
-      - name: Print secrets
+      - name: Use the secret
+        # Dummy example showing the secret is not an empty string
         run: |
-          echo "Hello ${{ steps.secrets.outputs.WORLD }}!"
-          echo "Hello ${{ steps.secrets.outputs.WORLD }}!" >> "${GITHUB_STEP_SUMMARY}"
+          echo "::notice::🔐 Logging in to secure system! ${{ steps.secrets.outputs.ACCESS_TOKEN != '' }}"
