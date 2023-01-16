@@ -3,13 +3,10 @@ name: Step 4, Fine-grained permissions - environments
 # This step will retrieve a secret from Vault if the appropriate Environment is applied
 
 # This workflow will succeed from any trigger as long as Vault roles are bound to the given Environments in the workflow.
+# However, for the course to properly update to the next step, this workflow should be run from a manual `workflow_dispatch` from the `main` branch.
 # Reference: https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-  push:
 
 # Reference: https://docs.github.com/en/actions/security-guides/automatic-token-authentication
 permissions:

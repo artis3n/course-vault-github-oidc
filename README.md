@@ -573,11 +573,9 @@ If you still have this repository open from the previous activity, make sure to 
     git checkout main
     git pull
     ```
-1. You can work from whatever branch you'd prefer for this activity, including the `main` branch.
-Our examples will use a `step4` branch.
-   ```bash
-    git checkout -b step4
-    ```
+1. From the code editor, make sure you are working on the `main` branch.
+**For this activity to properly update you to the next step, you must push code to the `main` branch.**
+Environments are not restricted to the `main` branch by default, but this workflow must run from the `main` branch for this course to properly track your progress.
 1. In your code editor, open the file `.github/workflows/4-environment.yml`.
 1. There are two jobs in this workflow file!
 `staging` and `prod`.
@@ -727,30 +725,23 @@ You should now have two environments configured on your repository, `Staging` an
 
 We're now ready to run the workflow!
 
-1. Commit the changes from these two activities to your chosen branch and push them to GitHub.
-This example will use a `step4` branch.
+1. Commit the changes from these two activities and push them to GitHub.
     ```bash
-    git checkout -b step4
+    git checkout main
     git add .
     git commit -m "Fine-grained permissions - environments"
-    git push --set-upstream origin step4
+    git push
     ```
 1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
 1. Go to the **Actions** tab.
 1. On the left-hand side, under "All workflows," select **Step 4, Fine-grained permissions - environments**.
-After a few seconds, you should observe a new workflow start up.
+1. On the right-hand side, open the **Run workflow** menu and click **Run workflow**.
 1. Wait until the workflow completes - you should see both the `staging` and `production` jobs complete successfully with a green checkmark.
 If the workflow fails, check the previous activities to ensure you've created two environments and configured both Vault roles in the workflow file.
 
     ![Both environments deploy successfully](https://user-images.githubusercontent.com/6969296/212571497-39feb61a-c1b6-4d3f-8411-9ad3ea029794.png)
 
-1. Once the workflow is successful, merge your `step4` branch into `main`.
-    ```bash
-    git checkout main
-    git merge step4
-    git push
-    ```
-1. Wait about 1 minute further, then refresh this README page for the next step.
+1. Once this workflow is successful, wait about 20 seconds further, then refresh this README page for the next step.
 
 </details>
 
