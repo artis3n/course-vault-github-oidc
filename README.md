@@ -37,9 +37,10 @@ Understand the principles behind configuring OIDC authentication from GitHub Act
 <details id=0 open>
 <summary><h2>Step 0: How to start this course</h2></summary>
 
-1. Above these instructions, right-click **Use this template** and open the link in a new tab.
+1. Make sure you are signed in to GitHub.
+Above these instructions, right-click **Use this template** and open the link in a new tab.
 
-   ![Use this template](https://user-images.githubusercontent.com/1221423/169618716-fb17528d-f332-4fc5-a11a-eaa23562665e.png)
+    ![Use this template](https://user-images.githubusercontent.com/6969296/212726721-6ec2ba4b-4790-43de-b9db-0a6a9b93a227.png)
 
 1. In the new tab, follow the prompts to create a new repository.
     - For owner, choose your personal account or an organization to host the repository.
@@ -47,7 +48,8 @@ Understand the principles behind configuring OIDC authentication from GitHub Act
 
     ![Create a new repository](https://user-images.githubusercontent.com/6969296/212442636-86499765-9429-451a-8dfc-1d7f48fa836e.png)
 
-1. After your new repository is created, wait about 20 seconds, then refresh the page. Follow the step-by-step instructions in the new repository's README.
+1. After your new repository is created, wait about 20 seconds, then refresh that page.
+Follow the step-by-step instructions in the new repository's README.
 
 </details>
 
@@ -86,12 +88,12 @@ Let's explore a "hello world" example.
 
 ### :keyboard: Activity: OIDC Hello World
 
-You may see some workflows fail for future steps, like "Step 4, Fine-grained permissions - environments".
+You may see some workflows fail for future steps, like "Step 3, Fine-grained permissions - branches".
 That is ok!
 We will get to them later.
 You can ignore those failures for now.
 
-1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
+1. Open your repo in a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
 1. Go to the **Actions tab**.
 1. On the left-hand side, under "All workflows," select **Step 1, OIDC Hello World**.
 1. On the right-hand side, open the **Run workflow** menu and click **Run workflow**.
@@ -99,12 +101,15 @@ You can ignore those failures for now.
     ![Manually run workflow](https://user-images.githubusercontent.com/6969296/212499178-7cfc18f9-6860-4d88-a21d-02806b358bb2.png)
 
 1. After a few seconds, the workflow run will appear. Click into it.
-   It can take between 20-40 seconds for this workflow to complete.
-   Wait until the workflow completes - you should see a green checkmark.
+It can take between 20-40 seconds for this workflow to complete.
+Wait until the workflow completes - you should see a green checkmark.
 
-   ![Workflow succeeds](https://user-images.githubusercontent.com/6969296/212499911-42871f96-7e11-4cbf-8d23-5fd1bc0cf480.png)
+    ![Workflow succeeds](https://user-images.githubusercontent.com/6969296/212499911-42871f96-7e11-4cbf-8d23-5fd1bc0cf480.png)
 
 1. Wait about 20 seconds then refresh this README page for the next step.
+
+Don't worry if you don't understand everything that happened in this step.
+We will go over the details in the next step.
 
 </details>
 
@@ -272,7 +277,7 @@ Give yourself a pat on the back for making it here.
 Next, you will create your own OIDC Vault role!
 This role will allow a workflow to authenticate to Vault, but only if the workflow runs inside of a pull request.
 
-1. Open this repository in a code editor.
+1. Open this repository in a code editor or GitHub Codespace.
 1. From the code editor, checkout a new branch.
 **For this activity, you must open a pull request from a branch other than `main`.**
     ```bash
@@ -309,7 +314,8 @@ In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` 
       uses: hashicorp/vault-action@v2.4.3
       id: secrets
       with:
-        role: ""  # Don't forget to enter the role name you created above!
+        # TODO: Don't forget to enter the role name you created above!
+        role: ""
         # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
         secrets: |
           secret/data/development access_token | ACCESS_TOKEN ;
@@ -338,14 +344,12 @@ After a few seconds, you should observe the `Step 2, Fine-grained permissions - 
 
     ![Pull request workflow running](https://user-images.githubusercontent.com/6969296/212520410-1f4a73ba-67db-4471-bf2c-fcc2d819f473.png)
 
-    You may see other workflows trigger and fail for future steps, like "Step 4, Fine-grained permissions - environments".
-    That is ok!
-    We will get to them later.
-    You can ignore those failures for now.
 1. Wait until your `Step 2, Fine-grained permissions - pull requests` workflow completes - you should see a green checkmark.
 If the workflow fails, check that your `org/repo` value is correct for your current repository!
 Ensure the `role` name matches between both steps in the workflow.
 1. Once the PR workflow is successful, wait about 20 seconds further, then refresh this README page for the next step.
+
+Once the workflow is green, feel free to merge the PR or leave it as-is before moving on to the next step.
 
 </details>
 
@@ -377,9 +381,10 @@ If you inspect the job summary for the `Step 2, Fine-grained permissions - pull 
 
 Given any use of our secrets is redacted from GitHub's logs, this is a contrived example to demonstrate that `steps.secrets.outputs.ACCESS_TOKEN` is not empty - the value of the secret has been populated from Vault.
 
-If you haven't already, merge your pull request and attempt to manually run the `Step 2, Fine-grained permissions - pull requests` workflow like we did in Step 1.
+If you haven't already, merge your pull request and attempt to manually run the `Step 2, Fine-grained permissions - pull requests` workflow - select it from under the "All workflows" pane similar to what you did in Step 1.
 The workflow should fail with a 400 error trying to authenticate to Vault - because you're running it via a manual `workflow_dispatch` instead of a `pull_request`!
-You can add a `push:` trigger and try that as well - authentication to Vault will fail because the GitHub JWT's claims no longer match the bound subject (`sub`) claim we defined for the Vault role.
+Optionally, you can modify the workflow and add a `push:` trigger and try that as well.
+Authentication to Vault will also fail because the GitHub JWT's claims no longer match the bound subject (`sub`) claim we defined for the Vault role.
 
 ### Bound claims
 
@@ -475,7 +480,7 @@ Let's apply what we've learned to our next workflow.
 You're going to follow the instructions from our previous activity, but this time you're going to bind the Vault role to the `main` branch.
 Vault authentication in this workflow will succeed only if the workflow is triggered by a push to the `main` branch.
 
-1. Open this repository in a code editor.
+1. Open this repository in a code editor or GitHub Codespace.
 If you still have this repository open from the previous activity, make sure to pull the latest changes from the `main` branch.
     ```bash
     git checkout main
@@ -514,7 +519,8 @@ The workflow won't run unless the `org/repo` string is correct for your reposito
       uses: hashicorp/vault-action@v2.4.3
       id: secrets
       with:
-        role: ""  # Don't forget to enter the role name you created above!
+        # TODO: Don't forget to enter the role name you created above!
+        role: ""
         # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
         secrets: |
           secret/data/production access_token | ACCESS_TOKEN ;
@@ -536,13 +542,15 @@ Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
     git commit -m "Fine-grained permissions - branches"
     git push
     ```
-1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
+1. Open your repo in a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
 1. Go to the **Actions** tab.
 1. On the left-hand side, under "All workflows," select **Step 3, Fine-grained permissions - branches**.
 After a few seconds, you should observe a new workflow start up.
 1. Wait until the workflow completes - you should see a green checkmark.
-If the workflow fails, check that your `org/repo` value is correct for your current repository!
+    - If the workflow fails, check that your `org/repo` value is correct for your current repository!
 Ensure the `role` name matches between both steps in the workflow.
+    - If you continue to receive an error, pay close attention to the `sub` claim!
+It should end with `:ref:refs/heads/main`.
 1. Once this workflow is successful, wait about 20 seconds further, then refresh this README page for the next step.
 
 </details>
@@ -565,7 +573,7 @@ We'll also need to create the GitHub Environments on our repository.
 
 ### :keyboard: Activity: Fine-grained permissions - environments
 
-1. Open this repository in a code editor.
+1. Open this repository in a code editor or GitHub Codespace.
 If you still have this repository open from the previous activity, make sure to pull the latest changes from the `main` branch.
     ```bash
     git checkout main
@@ -615,9 +623,11 @@ The workflow won't run unless the `org/repo` string is correct for your reposito
         }
         EOF
     ```
-   **Environment names are case-sensitive.**
-   `staging` is not the same as `Staging`.
+    > **Note**
+    >
+    > **Environment names are case-sensitive.** `staging` is not the same as `Staging`.
 1. Don't forget to pick a name for your Vault role as well!
+You should use different names for the staging and production Vault roles.
 In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` and `-`) name of your choosing.
 1. Under the **staging** job, locate the next step in the job, `name: Retrieve Secrets`.
     ```yml
@@ -625,7 +635,8 @@ In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` 
       uses: hashicorp/vault-action@v2.4.3
       id: secrets
       with:
-        role: ""  # Don't forget to enter the role name you created above!
+        # TODO: Don't forget to enter the role name you created above!
+        role: ""
         # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
         secrets: |
           secret/data/staging access_token | ACCESS_TOKEN ;
@@ -663,9 +674,11 @@ The workflow won't run unless the `org/repo` string is correct for your reposito
         }
         EOF
     ```
-   **Environment names are case-sensitive.**
-   `production` is not the same as `Production`.
+    > **Note**
+    >
+    > **Environment names are case-sensitive.** `production` is not the same as `Production`.
 1. Don't forget to pick a name for your Vault role as well!
+You should use different names for the staging and production Vault roles.
 In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` and `-`) name of your choosing.
 1. Under the **prod** job, locate the next step in the job, `name: Retrieve Secrets`.
     ```yml
@@ -673,7 +686,8 @@ In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` 
       uses: hashicorp/vault-action@v2.4.3
       id: secrets
       with:
-        role: ""  # Don't forget to enter the role name you created above!
+        # TODO: Don't forget to enter the role name you created above!
+        role: ""
         # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
         secrets: |
           secret/data/production access_token | ACCESS_TOKEN ;
@@ -698,7 +712,7 @@ Let's do that now.
 
 ### :keyboard: Activity: Create the GitHub Environments
 
-1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
+1. Open your repo in a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
 1. Go to the **Settings tab**.
 1. On the left-hand side, select **Environments** then **New environment**.
 
@@ -730,7 +744,7 @@ We're now ready to run the workflow!
     git commit -m "Fine-grained permissions - environments"
     git push
     ```
-1. Open a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
+1. Open your repo in a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
 1. Go to the **Actions** tab.
 1. On the left-hand side, under "All workflows," select **Step 4, Fine-grained permissions - environments**.
 1. On the right-hand side, open the **Run workflow** menu and click **Run workflow**.
@@ -758,7 +772,7 @@ Here's a recap of all the tasks you've accomplished in your repository:
 - Customize the `bound_claims` of a Vault role to provide fine-grained access control across workflows
 - Create a workflow that can only retrieve secrets when triggered by a pull request
 - Create a workflow that can only retrieve secrets when triggered by a push to the `main` branch
-- Create jobs in a workflow that can only retrieve secrets when assigned to a specific GitHub Environment
+- Create jobs in a workflow that can only retrieve secrets when assigned to a specific GitHub Environment, and can't access each other's secrets
 
 Remember that configuring Vault roles should typically happen separately from consuming secrets, so you'll likely want to create a separate workflow that creates Vault roles.
 However, for the sake of this course, we've configured Vault roles in the same workflows that consumed secrets.

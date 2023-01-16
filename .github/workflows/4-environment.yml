@@ -80,7 +80,8 @@ jobs:
         uses: hashicorp/vault-action@v2.4.3
         id: secrets
         with:
-          role: ""  # Don't forget to enter the role name you created above!
+          # TODO: Don't forget to enter the role name you created above!
+          role: ""
           # Retrieve a secret from the KV v2 secrets engine at the mount point `secret`.
           secrets: |
             secret/data/staging access_token | ACCESS_TOKEN ;
@@ -146,7 +147,8 @@ jobs:
         uses: hashicorp/vault-action@v2.4.3
         id: secrets
         with:
-          role: ""  # Don't forget to enter the role name you created above!
+          # TODO: Don't forget to enter the role name you created above!
+          role: ""
           secrets: |
             secret/data/production access_token | ACCESS_TOKEN ;
           # Required configuration, do not modify
