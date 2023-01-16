@@ -23,7 +23,7 @@ Understand the principles behind configuring OIDC authentication from GitHub Act
   Completing HashiCorp's Vault [Getting Started](https://developer.hashicorp.com/vault/tutorials/getting-started) tutorial is sufficient.
   1. You should also understand the layout of a GitHub Actions workflow file.
   The GitHub tutorial [Continuous Integration](https://github.com/skills/continuous-integration) provides a good introduction.
-- **How long**: This course is 4 steps long and takes less than 1 hour to complete.
+- **How long**: This course is 4 steps long and takes about 1 hour to complete.
 
 <!--
   <<< Author notes: Start of the course >>>
