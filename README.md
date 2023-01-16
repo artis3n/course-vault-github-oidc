@@ -284,7 +284,7 @@ This role will allow a workflow to authenticate to Vault, but only if the workfl
 1. Locate the step `name: Create an OIDC Role`.
 1. Replace this step with the following code.
 **Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course**.
-For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:pull_request"`.
+For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:pull_request"`.
 The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
@@ -489,7 +489,7 @@ If you still have this repository open from the previous activity, make sure to 
 1. Locate the step `name: Create an OIDC Role`.
 1. Replace this step with the following code.
 **Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course**.
-For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:ref:refs/heads/main"`.
+For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:ref:refs/heads/main"`.
 The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
@@ -598,7 +598,7 @@ To learn more about using Environments in workflow files, see [GitHub's workflow
 1. Under the **staging** job, locate the step `name: Create an OIDC Role`.
 1. Under the **staging** job, replace this step with the following code.
 **Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course**.
-For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:environment:Staging"`.
+For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:environment:Staging"`.
 The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
@@ -646,7 +646,7 @@ Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
 1. Under the **prod** job, locate the step `name: Create an OIDC Role`.
 1. Under the **prod** job, replace this step with the following code.
 **Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course**.
-For example, the course template hosted at <https://github.com/artis3n/tutorial-vault-github-oidc> would use: `"sub": "repo:artis3n/tutorial-vault-github-oidc:environment:Production"`.
+For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:environment:Production"`.
 The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
@@ -767,7 +767,7 @@ However, for the sake of this course, we've configured Vault roles in the same w
 
 ### What's next?
 
-- We'd love to hear what you thought of this course [in our discussion board](https://github.com/artis3n/tutorial-vault-github-oidc/discussions).
+- We'd love to hear what you thought of this course [in our discussion board](https://github.com/artis3n/course-vault-github-oidc/discussions).
 - You can combine multiple claims in a single Vault role to provide even more fine-grained access control!
 For example, learn how to combine `sub` and `job_workflow_ref` to [provide secrets for reusable workflows](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows).
 - Use this [Terraform module](https://github.com/digitalocean/terraform-vault-github-oidc) from DigitalOcean to help manage your GitHub OIDC Vault role configurations.
@@ -781,6 +781,6 @@ For example, learn how to combine `sub` and `job_workflow_ref` to [provide secre
 
 ---
 
-Get help: [Post in our discussion board](https://github.com/artis3n/tutorial-vault-github-oidc/discussions) &bull; Something not working? [File an issue ticket](https://github.com/artis3n/tutorial-vault-github-oidc/issues)
+Get help: [Post in our discussion board](https://github.com/artis3n/course-vault-github-oidc/discussions) &bull; Something not working? [File an issue ticket](https://github.com/artis3n/course-vault-github-oidc/issues)
 
 &copy; 2022 Ari Kalfus &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [CC-BY-4.0 License](https://creativecommons.org/licenses/by/4.0/legalcode)
