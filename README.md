@@ -37,8 +37,6 @@ Understand the principles behind configuring OIDC authentication from GitHub Act
 <details id=0 open>
 <summary><h2>Step 0: How to start this course</h2></summary>
 
-## How to start this course
-
 1. Above these instructions, right-click **Use this template** and open the link in a new tab.
 
    ![Use this template](https://user-images.githubusercontent.com/1221423/169618716-fb17528d-f332-4fc5-a11a-eaa23562665e.png)
@@ -753,7 +751,7 @@ If the workflow fails, check the previous activities to ensure you've created tw
 <details id=5>
 <summary><h2>Finish</h2></summary>
 
-_Congratulations friend, you've completed this course! :1st_place_medal: _
+_Congratulations friend, you've completed this course! :1st_place_medal:_
 
 Here's a recap of all the tasks you've accomplished in your repository:
 - Configure Vault to accept GitHub OIDC authentication requests
