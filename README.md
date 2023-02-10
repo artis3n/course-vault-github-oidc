@@ -782,6 +782,7 @@ However, for the sake of this course, we've configured Vault roles in the same w
 - We'd love to hear what you thought of this course [in our discussion board](https://github.com/artis3n/course-vault-github-oidc/discussions).
 - You can combine multiple claims in a single Vault role to provide even more fine-grained access control!
 For example, learn how to combine `sub` and `job_workflow_ref` to [provide secrets for reusable workflows](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/using-openid-connect-with-reusable-workflows).
+- Read [this comprehensive article](https://www.digitalocean.com/blog/fine-grained-rbac-for-github-action-workflows-hashicorp-vault) to learn how DigitalOcean employs this GitHub OIDC pattern for streamlined secrets management.
 - Use this [Terraform module](https://github.com/digitalocean/terraform-vault-github-oidc) from DigitalOcean to help manage your GitHub OIDC Vault role configurations.
 
 </details>
