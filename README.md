@@ -11,7 +11,7 @@
 
 Understand the principles behind configuring OIDC authentication from GitHub Action workflows to HashiCorp Vault for least-privilege access to secrets from CI/CD pipelines.
 
-- **Who is this for**: Developers, Security engineers, and operators of secrets management programs inside organizations.
+- **Who is this for**: Developers, security engineers, and operators of secrets management programs.
 - **What you'll learn**: How to use GitHub OIDC for fine-grained role access to secrets in HashiCorp Vault.
 - **What you'll build**: You will create three GitHub Action workflows retrieving secrets from Vault for the following use cases:
   1. Non-production secrets for integration testing within pull requests
@@ -20,7 +20,7 @@ Understand the principles behind configuring OIDC authentication from GitHub Act
 - **Prerequisites**:
   1. You should have basic proficiency working with HashiCorp Vault.
   You should understand how Vault roles correspond to HCL policies and how policies grant access to secrets.
-  Completing HashiCorp's Vault [Getting Started](https://developer.hashicorp.com/vault/tutorials/getting-started) tutorial is sufficient.
+  Completing HashiCorp's [Vault Getting Started](https://developer.hashicorp.com/vault/tutorials/getting-started) tutorial is sufficient.
   1. You should also understand the layout of a GitHub Actions workflow file.
   The GitHub tutorial [Continuous Integration](https://github.com/skills/continuous-integration) provides a good introduction.
 - **How long**: This course is 4 steps long and takes about 1 hour to complete.
@@ -156,12 +156,12 @@ Also see ["Permissions for the `GITHUB_TOKEN`"](https://docs.github.com/en/actio
   run: ./.github/script/1-setup.sh
 ```
 
-For the purposes of this course, we set up a dev Vault instance for you to authenticate against using OIDC.
+For the purposes of this course, we set up a local Vault instance for you to authenticate against using OIDC.
 We'll take a look at this setup script in a moment.
 
 ```yml
 - name: Retrieve Secrets
-  uses: hashicorp/vault-action@v2.4.3
+  uses: hashicorp/vault-action@v2.5.0
   id: secrets
   with:
     url: http://127.0.0.1:8200
@@ -250,7 +250,7 @@ EOF
 
 Finally, we created a role that binds to the `iss` claim in GitHub's OIDC token.
 This claim means that anyone anywhere on github.com can authenticate to this Vault instance and be granted the `hello-policy` policy.
-You don't want to use this in real life! :wink: :scream:
+**You don't want to use this in real life!** :wink: :scream:
 We'll explore real-world examples of fine-grained access in the next steps of this course.
 
 Let's look at the other values:
@@ -337,8 +337,11 @@ Open a pull request from your branch to the `main` branch.
     git commit -m "Add OIDC role for pull requests"
     gh pr create --title "Fine-grained permissions - pull requests" --body "This pull request adds a new workflow that uses Vault to retrieve a secret only if the workflow runs inside a pull request."
     ```
-    The `gh` command comes from the [GitHub CLI](https://cli.github.com/).
-    You can create the pull request from the UI as well.
+
+    > **Note**
+    >
+    > The `gh` command comes from the [GitHub CLI](https://cli.github.com/).
+    > You can create the pull request from the UI as well.
 1. Go to the **Pull Requests** tab and open your new pull request.
 After a few seconds, you should observe the `Step 2, Fine-grained permissions - pull requests` workflow begin to run on your PR.
 
