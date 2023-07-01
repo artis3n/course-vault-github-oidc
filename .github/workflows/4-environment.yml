@@ -77,7 +77,7 @@ jobs:
           EOF
 
       - name: Retrieve Secrets
-        uses: hashicorp/vault-action@v2.5.0
+        uses: hashicorp/vault-action@v2.7.0
         id: secrets
         with:
           # TODO: Don't forget to enter the role name you created above!
@@ -144,7 +144,7 @@ jobs:
           EOF
 
       - name: Retrieve Secrets
-        uses: hashicorp/vault-action@v2.5.0
+        uses: hashicorp/vault-action@v2.7.0
         id: secrets
         with:
           # TODO: Don't forget to enter the role name you created above!
