@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Initializes Vault with a JWT backend for GitHub OIDC
       # Creates policies for our two environments - if we were using a real Vault, these would both be present
@@ -114,7 +114,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Vault
         env:
