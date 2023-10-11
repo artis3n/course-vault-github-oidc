@@ -25,33 +25,33 @@ If you still have this repository open from the previous activity, make sure to 
     > [!IMPORTANT]
     > For this activity to properly update you to the next step, you must push code to the `main` branch.
 
-Environments are not restricted to the `main` branch by default, but this workflow must run from the `main` branch for this course to properly track your progress.
-1. In your code editor, open the file `.github/workflows/4-environment.yml`.
-2. There are two jobs in this workflow file!
-`staging` and `prod`.
-We'll configure a Vault role for each job.
-Notice the `staging` job includes the `environment: Staging` attribute and the `prod` job includes the `environment: Production` attribute.
-To learn more about using Environments in workflow files, see [GitHub's workflow syntax for environments](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idenvironment).
-    ```yml
-    staging:
-      name: Retrieve staging secrets
-      # We need to create a "Staging" Environment and bind it to Vault!
-      environment: Staging
+    Environments are not restricted to the `main` branch by default, but this workflow must run from the `main` branch for this course to properly track your progress.
+    1. In your code editor, open the file `.github/workflows/4-environment.yml`.
+    1. There are two jobs in this workflow file!
+    `staging` and `prod`.
+    We'll configure a Vault role for each job.
+    Notice the `staging` job includes the `environment: Staging` attribute and the `prod` job includes the `environment: Production` attribute.
+    To learn more about using Environments in workflow files, see [GitHub's workflow syntax for environments](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idenvironment).
+        ```yml
+        staging:
+          name: Retrieve staging secrets
+          # We need to create a "Staging" Environment and bind it to Vault!
+          environment: Staging
 
-      # ...
+          # ...
 
-    prod:
-      name: Retrieve production secrets
-      # We need to create a "Production" Environment and bind it to Vault!
-      environment: Production
-    ```
+        prod:
+          name: Retrieve production secrets
+          # We need to create a "Production" Environment and bind it to Vault!
+          environment: Production
+        ```
 1. Under the **staging** job, locate the step `name: Create an OIDC Role`.
 2. Under the **staging** job, replace this step with the following code.
     > [!IMPORTANT]
     > Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course.
 
-For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:environment:Staging"`.
-The workflow won't run unless the `org/repo` string is correct for your repository.
+    For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:environment:Staging"`.
+    The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
       env:
@@ -91,19 +91,19 @@ In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` 
         method: jwt
         exportEnv: false
     ```
-2. Everything is set up for you, however the `role: ""` is missing.
+1. Everything is set up for you, however the `role: ""` is missing.
 Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
     ```yml
     role: "GIVE_ME_A_NAME"  # Enter the same role name you previously chose!
     ```
 1. Now repeat both updates for the **prod** job.
-2. Under the **prod** job, locate the step `name: Create an OIDC Role`.
-3. Under the **prod** job, replace this step with the following code.
+1. Under the **prod** job, locate the step `name: Create an OIDC Role`.
+1. Under the **prod** job, replace this step with the following code.
     > [!IMPORTANT]
     > Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course.
 
-For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:environment:Production"`.
-The workflow won't run unless the `org/repo` string is correct for your repository.
+    For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:environment:Production"`.
+    The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
     - name: Create an OIDC Role
       env:
