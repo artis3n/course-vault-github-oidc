@@ -29,7 +29,7 @@ jobs:
     # Reference: https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idservices
     services:
       vault:
-        image: vault:1.12.3
+        image: hashicorp/vault:1.15
         # Make vault accessible to the runner at localhost:8200
         ports:
           - 8200:8200
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Initializes Vault with a JWT backend for GitHub OIDC
       # Creates policies for our two environments - if we were using a real Vault, these would both be present
@@ -77,7 +77,7 @@ jobs:
           EOF
 
       - name: Retrieve Secrets
-        uses: hashicorp/vault-action@v2.7.0
+        uses: hashicorp/vault-action@v2
         id: secrets
         with:
           # TODO: Don't forget to enter the role name you created above!
@@ -104,7 +104,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       vault:
-        image: vault:1.12.3
+        image: hashicorp/vault:1.15
         ports:
           - 8200:8200
         env:
@@ -114,7 +114,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Vault
         env:
@@ -144,7 +144,7 @@ jobs:
           EOF
 
       - name: Retrieve Secrets
-        uses: hashicorp/vault-action@v2.7.0
+        uses: hashicorp/vault-action@v2
         id: secrets
         with:
           # TODO: Don't forget to enter the role name you created above!
