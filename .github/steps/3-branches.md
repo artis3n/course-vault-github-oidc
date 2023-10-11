@@ -133,33 +133,34 @@ If you still have this repository open from the previous activity, make sure to 
 1. From the code editor, make sure you are working on the `main` branch.
     > [!IMPORTANT]
     > For this activity, you must push code to the `main` branch.
-2. In your code editor, open the file `.github/workflows/3-main-branch.yml`.
-3. Locate the step `name: Create an OIDC Role`.
-4. Replace this step with the following code.
+1. In your code editor, open the file `.github/workflows/3-main-branch.yml`.
+1. Locate the step `name: Create an OIDC Role`.
+1. Replace this step with the following code.
     > [!IMPORTANT]
     > Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course.
-For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:ref:refs/heads/main"`.
-The workflow won't run unless the `org/repo` string is correct for your repository.
-    ```yml
-    - name: Create an OIDC Role
-      env:
-        VAULT_ADDR: http://127.0.0.1:8200
-      run: |
-        vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
-        {
-          "role_type": "jwt",
-          "user_claim": "actor",
-          "bound_claims": {
-            "sub": "repo:YOUR_REPO:ref:refs/heads/main"
-          },
-          "policies": ["main-policy"],
-          "ttl": "60s"
-        }
-        EOF
-    ```
+
+    For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:ref:refs/heads/main"`.
+    The workflow won't run unless the `org/repo` string is correct for your repository.
+        ```yml
+        - name: Create an OIDC Role
+          env:
+            VAULT_ADDR: http://127.0.0.1:8200
+          run: |
+            vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
+            {
+              "role_type": "jwt",
+              "user_claim": "actor",
+              "bound_claims": {
+                "sub": "repo:YOUR_REPO:ref:refs/heads/main"
+              },
+              "policies": ["main-policy"],
+              "ttl": "60s"
+            }
+            EOF
+        ```
 1. Don't forget to pick a name for your Vault role as well!
    In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` and `-`) name of your choosing.
-2. Locate the next step in the job, `name: Retrieve Secrets`.
+1. Locate the next step in the job, `name: Retrieve Secrets`.
     ```yml
     - name: Retrieve Secrets
       uses: hashicorp/vault-action@v2
@@ -176,7 +177,7 @@ The workflow won't run unless the `org/repo` string is correct for your reposito
         method: jwt
         exportEnv: false
     ```
-3. Everything is set up for you, however the `role: ""` is missing.
+1. Everything is set up for you, however the `role: ""` is missing.
 Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
     ```yml
     role: "GIVE_ME_A_NAME"  # Enter the same role name you previously chose!
@@ -188,9 +189,9 @@ Enter the `GIVE_ME_A_NAME` role name you chose in the previous step.
     git commit -m "Fine-grained permissions - branches"
     git push
     ```
-2. Open your repo in a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
-3. Go to the **Actions** tab.
-4. On the left-hand side, under "All workflows," select **Step 3, Fine-grained permissions - branches**.
+1. Open your repo in a new browser tab, and work on these steps in your second tab while you read the instructions in this tab.
+1. Go to the **Actions** tab.
+1. On the left-hand side, under "All workflows," select **Step 3, Fine-grained permissions - branches**.
 After a few seconds, you should observe a new workflow start up.
 1. Wait until the workflow completes - you should see a green checkmark.
     - If the workflow fails, check that your `org/repo` value is correct for your current repository!
