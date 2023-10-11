@@ -138,6 +138,7 @@ If you still have this repository open from the previous activity, make sure to 
 4. Replace this step with the following code.
     > [!IMPORTANT]
     > Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course.
+
 For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:ref:refs/heads/main"`.
 The workflow won't run unless the `org/repo` string is correct for your repository.
     ```yml
