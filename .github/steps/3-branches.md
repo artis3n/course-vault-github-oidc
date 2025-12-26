@@ -130,35 +130,39 @@ If you still have this repository open from the previous activity, make sure to 
     git checkout main
     git pull
     ```
-1. From the code editor, make sure you are working on the `main` branch.
-    > [!IMPORTANT]
-    > For this activity, you must push code to the `main` branch.
-1. In your code editor, open the file `.github/workflows/3-main-branch.yml`.
-1. Locate the step `name: Create an OIDC Role`.
-1. Replace this step with the following code.
-    > [!IMPORTANT]
-    > Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course.
+2. From the code editor, make sure you are working on the `main` branch.
+  
+> [!IMPORTANT]
+> For this activity, you must push code to the `main` branch.
 
-    For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:ref:refs/heads/main"`.
-    The workflow won't run unless the `org/repo` string is correct for your repository.
-        ```yml
-        - name: Create an OIDC Role
-          env:
-            VAULT_ADDR: http://127.0.0.1:8200
-          run: |
-            vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
-            {
-              "role_type": "jwt",
-              "user_claim": "actor",
-              "bound_claims": {
-                "sub": "repo:YOUR_REPO:ref:refs/heads/main"
-              },
-              "policies": ["main-policy"],
-              "ttl": "60s"
-            }
-            EOF
-        ```
-1. Don't forget to pick a name for your Vault role as well!
+3. In your code editor, open the file `.github/workflows/3-main-branch.yml`.
+4. Locate the step `name: Create an OIDC Role`.
+5. Replace this step with the following code.
+
+> [!IMPORTANT]
+> Replace the `YOUR_REPO` section with the `org/repo` string that applies to the repository you created from this course.
+
+For example, the course template hosted at <https://github.com/artis3n/course-vault-github-oidc> would use: `"sub": "repo:artis3n/course-vault-github-oidc:ref:refs/heads/main"`.
+The workflow won't run unless the `org/repo` string is correct for your repository.
+```yml
+- name: Create an OIDC Role
+  env:
+    VAULT_ADDR: http://127.0.0.1:8200
+  run: |
+    vault write auth/gha/role/GIVE_ME_A_NAME - << EOF
+    {
+      "role_type": "jwt",
+      "user_claim": "actor",
+      "bound_claims": {
+        "sub": "repo:YOUR_REPO:ref:refs/heads/main"
+      },
+      "policies": ["main-policy"],
+      "ttl": "60s"
+    }
+    EOF
+```
+
+6. Don't forget to pick a name for your Vault role as well!
    In the same code block, replace `GIVE_ME_A_NAME` with an alphanumeric (plus `_` and `-`) name of your choosing.
 1. Locate the next step in the job, `name: Retrieve Secrets`.
     ```yml
