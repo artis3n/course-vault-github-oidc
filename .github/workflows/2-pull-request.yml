@@ -46,7 +46,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       # Initializes Vault with a JWT backend for GitHub OIDC
       # Creates a `pr-policy` policy granting access to `secret/data/development`
