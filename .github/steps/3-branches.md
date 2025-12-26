@@ -131,7 +131,7 @@ If you still have this repository open from the previous activity, make sure to 
     git pull
     ```
 2. From the code editor, make sure you are working on the `main` branch.
-  
+
 > [!IMPORTANT]
 > For this activity, you must push code to the `main` branch.
 

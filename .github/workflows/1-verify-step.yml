@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v5
       - id: get_step
         run: |
-          echo "current_step=$(cat ./.github/steps/-step.txt)" >> $GITHUB_OUTPUT
+          echo "current_step=$(cat ./.github/steps/-step.txt)" >> "$GITHUB_OUTPUT"
     outputs:
       current_step: ${{ steps.get_step.outputs.current_step }}
 
