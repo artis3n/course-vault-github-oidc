@@ -27,10 +27,14 @@ EOF
 # Every other workflow configuration in this tutorial is real-world viable, but this
 # is configured solely to allow attendees of this course to authenticate from their
 # clone of this repo - enable a quick win in the first exercise of the course.
+#
+# Vault 1.16.3+ requires bound_audiences when the JWT contains aud (GitHub OIDC always does).
+# Default GitHub aud is the repo owner URL; GITHUB_REPOSITORY_OWNER is set on Actions runners.
 vault write auth/gha/role/hello-world - << EOF
 {
   "role_type": "jwt",
   "user_claim": "actor",
+  "bound_audiences": ["https://github.com/${GITHUB_REPOSITORY_OWNER}"],
   "bound_claims": {
       "iss": "https://token.actions.githubusercontent.com"
   },
