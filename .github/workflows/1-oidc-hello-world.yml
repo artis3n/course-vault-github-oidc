@@ -49,6 +49,7 @@ jobs:
       - name: Setup Vault
         env:
           VAULT_ADDR: http://127.0.0.1:8200
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: ./.github/script/1-setup.sh
 
       - name: Retrieve Secrets
