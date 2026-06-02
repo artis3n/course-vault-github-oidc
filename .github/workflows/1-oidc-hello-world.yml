@@ -53,7 +53,7 @@ jobs:
         run: ./.github/script/1-setup.sh
 
       - name: Retrieve Secrets
-        uses: hashicorp/vault-action@v3
+        uses: hashicorp/vault-action@v4
         id: secrets
         with:
           # The previous step created a `hello-world` Vault role in `.setup/1-setup.sh`.
